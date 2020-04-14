@@ -28,3 +28,13 @@ In order to reproduce the problem:
    d = DeviceProxy("test/devicememleak/1")
    d.Start()
    ```
+# C++ example
+
+In `cpp` folder, you will find a C++ Device server able to push events for attr1 DevEncoded attribute.
+This C++ device server does not seem to suffer from this memory leak.
+- It provides a `PushEncodedEvent` command to push a change event for `attr1` attribute.
+- The `Start` command starts a thread which will push change events for `attr1` attribute.
+- The `Stop` command stops the thread.
+- You can use the ThreadSleepTimeMs Device property to tune the thread sleeping time between 2 event pushes (default = 1ms).
+
+To compile it, simply generate a Makefile with Pogo from DeviceMemLeak.xmi file and type `make` in the cpp directory.

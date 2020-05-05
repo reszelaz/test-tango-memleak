@@ -28,3 +28,26 @@ In order to reproduce the problem:
    d = DeviceProxy("test/devicememleak/1")
    d.Start()
    ```
+# C++ example
+
+In `cpp` folder, you will find a C++ Device server able to push events for attr1 DevEncoded attribute.
+This C++ device server does not seem to suffer from this memory leak.
+- It provides a `PushEncodedEvent` command to push a change event for `attr1` attribute.
+- The `Start` command starts a thread which will push change events for `attr1` attribute.
+- The `Stop` command stops the thread.
+- You can use the ThreadSleepTimeMs Device property to tune the thread sleeping time between 2 event pushes (default = 1ms).
+
+To compile it, simply generate a Makefile with Pogo from DeviceMemLeak.xmi file and type `make` in the cpp directory.
+
+Here is an example of the compilation commands you could use if you don't want to generate the Makefile with Pogo (you might need to define TANGO_HOME environment variable to point to your Tango install prefix path):
+
+```
+g++  -g -D_DEBUG -D_REENTRANT -W -I .  -I../include -I$TANGO_HOME/include/tango -I/usr/local/include  -std=c++11  -Dlinux -c DeviceMemLeak.cpp -o obj/DeviceMemLeak.o
+g++  -g -D_DEBUG -D_REENTRANT -W -I .  -I../include -I$TANGO_HOME/include/tango -I/usr/local/include -std=c++11  -Dlinux -c DeviceMemLeakClass.cpp -o obj/DeviceMemLeakClass.o
+g++  -g -D_DEBUG -D_REENTRANT -W -I .  -I../include -I$TANGO_HOME/include/tango -I/usr/local/include -std=c++11  -Dlinux -c DeviceMemLeakStateMachine.cpp -o obj/DeviceMemLeakStateMachine.o
+g++  -g -D_DEBUG -D_REENTRANT -W -I .  -I../include -I$TANGO_HOME/include/tango -I/usr/local/include -std=c++11  -Dlinux -c ClassFactory.cpp -o obj/ClassFactory.o
+g++  -g -D_DEBUG -D_REENTRANT -W -I .  -I../include -I$TANGO_HOME/include/tango -I/usr/local/include -std=c++11  -Dlinux -c main.cpp -o obj/main.o
+g++ ./obj/DeviceMemLeak.o ./obj/DeviceMemLeakClass.o ./obj/DeviceMemLeakStateMachine.o   ./obj/ClassFactory.o ./obj/main.o -L$TANGO_HOME/lib -L/usr/local/lib -ltango -lomniDynamic4 -lCOS4 -lomniORB4 -lomnithread -lzmq -ldl -lpthread -lstdc++ -o bin/DeviceMemLeak
+```
+
+Of course, you might need to adapt these compilation commands to fit your ZMQ, omniORB and Tango installation.
